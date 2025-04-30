@@ -47,7 +47,18 @@ export const atualizarUsuario = async (req, res) => {
       fotoPerfil,
     });
     res.json(usuarioAntigo);
+    console.log("Usuário atualizado com sucesso!");
   } catch (error) {
     console.error("Algo deu errado ao tentar atualizar o usuário", error);
+  }
+};
+
+export const deletarUsuario = async (req, res) => {
+  try {
+    await Usuario.findByIdAndDelete(req.params.id);
+    console.log("Usuário excluído com sucesso!");
+    res.status(204).end();
+  } catch (error) {
+    console.error("Algo deu errado ao tentar excluir o usuário...", error);
   }
 };
