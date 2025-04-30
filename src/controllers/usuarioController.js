@@ -14,9 +14,11 @@ const criarUsuario = async (req, res) => {
       fotoPerfil,
     });
     await novoUsuario.save();
-    res.send(201).json(novoUsuario);
+    res.status(201).json(novoUsuario);
     console.log("Usuário criado com sucesso!");
   } catch (error) {
     console.error("Algo deu errado ao tentar criar um novo usuário...", error);
   }
 };
+
+export default criarUsuario;
