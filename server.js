@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import connectDb from "./src/config/dbConnection.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -15,3 +16,5 @@ app.use("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor ativo na porta ${PORT}...`);
 });
+
+connectDb();
