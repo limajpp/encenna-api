@@ -1,6 +1,6 @@
 import Usuario from "../models/usuario.js";
 
-const criarUsuario = async (req, res) => {
+export const criarUsuario = async (req, res) => {
   try {
     const { nome, email, senhaHash, telefone, cpf, tipo, fotoPerfil } =
       req.body;
@@ -21,4 +21,14 @@ const criarUsuario = async (req, res) => {
   }
 };
 
-export default criarUsuario;
+export const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.find();
+    if (!usuarios)
+      return res.status(404).json({ erro: "A lista de usuário está vazia." });
+
+    res.status(200).json(usuarios);
+  } catch (error) {
+    console.error("Algo deu errado ao tentar listar os usuários...", error);
+  }
+};
