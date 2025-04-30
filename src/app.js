@@ -11,7 +11,6 @@ app.use(cors());
 connectDb();
 
 app.use("/api/usuario", usuarioRoutes);
-app.use("/api/usuario", usuarioRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");

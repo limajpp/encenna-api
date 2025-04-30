@@ -32,3 +32,22 @@ export const listarUsuarios = async (req, res) => {
     console.error("Algo deu errado ao tentar listar os usuários...", error);
   }
 };
+
+export const atualizarUsuario = async (req, res) => {
+  try {
+    const { nome, email, senhaHash, telefone, cpf, tipo, fotoPerfil } =
+      req.body;
+    const usuarioAntigo = await Usuario.findByIdAndUpdate(req.params.id, {
+      nome,
+      email,
+      senhaHash,
+      telefone,
+      cpf,
+      tipo,
+      fotoPerfil,
+    });
+    res.json(usuarioAntigo);
+  } catch (error) {
+    console.error("Algo deu errado ao tentar atualizar o usuário", error);
+  }
+};
