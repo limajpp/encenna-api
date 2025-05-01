@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDb from "./config/dbConnection.js";
@@ -18,6 +18,9 @@ app.use(express.json());
 app.use(cors());
 connectDb();
 
+app.get("/", (req, res) => {
+  res.send("API - Encenna");
+});
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/ensaio", ensaioRoutes);
 app.use("/api/participantesEnsaio", participanteEnsaioRoutes);
@@ -28,8 +31,8 @@ app.use("/api/audicao", audicaoRoutes);
 app.use("/api/biblioteca", bibliotecaRoutes);
 app.use("/api/pagamento", pagamentoRoutes);
 
-app.use("/", (req, res) => {
-  res.send("API - Encenna");
+app.use((req, res) => {
+  res.status(404).json({ erro: "Rota não existe..." });
 });
 
 export default app;
