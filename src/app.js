@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDb from "./config/dbConnection.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import ensaioRoutes from "./routes/ensaioRoutes.js";
+import participanteEnsaioRoutes from "./routes/participanteEnsaioRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,7 @@ connectDb();
 
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/ensaio", ensaioRoutes);
+app.use("/api/participanteEnsaio", participanteEnsaioRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");
