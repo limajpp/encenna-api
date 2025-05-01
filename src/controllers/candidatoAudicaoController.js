@@ -3,19 +3,19 @@ import CandidatoAudicao from "../models/candidatoAudicao.js";
 export const criarCandidato = async (req, res) => {
   try {
     const {
-      usuario_id,
-      audicao_id,
-      tipo_papel,
-      video_upload,
-      roteiro_disponivel,
+      usuarioId,
+      audicaoId,
+      tipoPapel,
+      videoUpload,
+      roteiroDisponivel,
     } = req.body;
 
     const novoCandidato = new CandidatoAudicao({
-      usuario_id,
-      audicao_id,
-      tipo_papel,
-      video_upload,
-      roteiro_disponivel,
+      usuarioId,
+      audicaoId,
+      tipoPapel,
+      videoUpload,
+      roteiroDisponivel,
     });
 
     await novoCandidato.save();
@@ -40,21 +40,21 @@ export const listarCandidatos = async (req, res) => {
 export const atualizarCandidato = async (req, res) => {
   try {
     const {
-      usuario_id,
-      audicao_id,
-      tipo_papel,
-      video_upload,
-      roteiro_disponivel,
+      usuarioId,
+      audicaoId,
+      tipoPapel,
+      videoUpload,
+      roteiroDisponivel,
     } = req.body;
 
     const candidatoAtualizado = await CandidatoAudicao.findByIdAndUpdate(
       req.params.id,
       {
-        usuario_id,
-        audicao_id,
-        tipo_papel,
-        video_upload,
-        roteiro_disponivel,
+        usuarioId,
+        audicaoId,
+        tipoPapel,
+        videoUpload,
+        roteiroDisponivel,
       }
     );
 
