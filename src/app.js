@@ -9,6 +9,7 @@ import turmaRoutes from "./routes/turmaRoutes.js";
 import matriculaRoutes from "./routes/matriculaRoutes.js";
 import candidatoAudicaoRoutes from "./routes/candidatoAudicaoRoutes.js";
 import audicaoRoutes from "./routes/audicaoRoutes.js";
+import bibliotecaRoutes from "./routes/bibliotecaRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/turma", turmaRoutes);
 app.use("/api/matricula", matriculaRoutes);
 app.use("/api/candidatoAudicao", candidatoAudicaoRoutes);
 app.use("/api/audicao", audicaoRoutes);
+app.use("/api/biblioteca", bibliotecaRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");
