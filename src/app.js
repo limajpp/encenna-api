@@ -8,6 +8,7 @@ import participanteEnsaioRoutes from "./routes/participanteEnsaioRoutes.js";
 import turmaRoutes from "./routes/turmaRoutes.js";
 import matriculaRoutes from "./routes/matriculaRoutes.js";
 import candidatoAudicaoRoutes from "./routes/candidatoAudicaoRoutes.js";
+import audicaoRoutes from "./routes/audicaoRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.use("/api/participantesEnsaio", participanteEnsaioRoutes);
 app.use("/api/turma", turmaRoutes);
 app.use("/api/matricula", matriculaRoutes);
 app.use("/api/candidatoAudicao", candidatoAudicaoRoutes);
+app.use("/api/audicao", audicaoRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");
