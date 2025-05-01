@@ -8,5 +8,5 @@ const participanteEnsaioSchema = mongoose.Schema({
 export default mongoose.model(
   "ParticipanteEnsaios",
   participanteEnsaioSchema,
-  "participanteEnsaio"
+  "participantesEnsaio"
 );

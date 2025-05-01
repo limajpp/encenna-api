@@ -14,7 +14,7 @@ connectDb();
 
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/ensaio", ensaioRoutes);
-app.use("/api/participanteEnsaio", participanteEnsaioRoutes);
+app.use("/api/participantesEnsaio", participanteEnsaioRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");
