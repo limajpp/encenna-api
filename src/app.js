@@ -5,6 +5,7 @@ import connectDb from "./config/dbConnection.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import ensaioRoutes from "./routes/ensaioRoutes.js";
 import participanteEnsaioRoutes from "./routes/participanteEnsaioRoutes.js";
+import turmaRoutes from "./routes/turmaRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,7 @@ connectDb();
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/ensaio", ensaioRoutes);
 app.use("/api/participantesEnsaio", participanteEnsaioRoutes);
+app.use("/api/turma", turmaRoutes);
 
 app.use("/", (req, res) => {
   res.send("API - Encenna");
