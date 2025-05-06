@@ -17,6 +17,9 @@ export const criarUsuario = async (req, res) => {
     res.status(201).json(novoUsuario);
     console.log("Usuário criado com sucesso!");
   } catch (error) {
+    res
+      .status(404)
+      .json({ erro: "Algo deu errado durante a criação do novo usuário!" });
     console.error("Algo deu errado ao tentar criar um novo usuário...", error);
   }
 };
@@ -55,7 +58,8 @@ export const atualizarUsuario = async (req, res) => {
 
 export const deletarUsuario = async (req, res) => {
   try {
-    await Usuario.findByIdAndDelete(req.params.id);
+    const oldUser = await Usuario.findByIdAndDelete(req.params.id);
+    if (!oldUser) res.status(404).json({ erro: "O usuário não existe..." });
     console.log("Usuário excluído com sucesso!");
     res.status(204).end();
   } catch (error) {
