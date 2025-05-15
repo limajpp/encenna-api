@@ -1,16 +1,11 @@
 import express from "express";
-import {
-  criarPagamento,
-  listarPagamentos,
-  atualizarPagamento,
-  deletarPagamento,
-} from "../controllers/pagamentoController.js";
+import PagamentoController from "../controllers/pagamentoController.js";
 
 const router = express.Router();
 
-router.post("/criarPagamento", criarPagamento);
-router.get("/listarPagamentos", listarPagamentos);
-router.put("/atualizarPagamento/:id", atualizarPagamento);
-router.delete("/deletarPagamento/:id", deletarPagamento);
+router.post("/criarPagamento", PagamentoController.criarPagamento);
+router.get("/listarPagamentos", PagamentoController.listarPagamentos);
+router.put("/atualizarPagamento/:id", PagamentoController.atualizarPagamento);
+router.delete("/deletarPagamento/:id", PagamentoController.deletarPagamento);
 
 export default router;

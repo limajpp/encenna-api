@@ -32,7 +32,9 @@ app.use("/api/biblioteca", bibliotecaRoutes);
 app.use("/api/pagamento", pagamentoRoutes);
 
 app.use((req, res) => {
-  res.status(404).json({ erro: "Rota não existe..." });
+  res
+    .status(404)
+    .json({ erro: `A Rota ${req.originalUrl} não é válida...` });
 });
 
 export default app;

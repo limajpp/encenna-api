@@ -1,16 +1,11 @@
 import express from "express";
-import {
-  criarCandidato,
-  listarCandidatos,
-  atualizarCandidato,
-  deletarCandidato,
-} from "../controllers/candidatoAudicaoController.js";
+import CandidatoAudicaoController from "../controllers/candidatoAudicaoController.js";
 
 const router = express.Router();
 
-router.post("/criarCandidato", criarCandidato);
-router.get("/listarCandidatos", listarCandidatos);
-router.put("/atualizarCandidato/:id", atualizarCandidato);
-router.delete("/deletarCandidato/:id", deletarCandidato);
+router.post("/criarCandidato", CandidatoAudicaoController.criarCandidato);
+router.get("/listarCandidatos", CandidatoAudicaoController.listarCandidatos);
+router.put("/atualizarCandidato/:id", CandidatoAudicaoController.atualizarCandidato);
+router.delete("/deletarCandidato/:id", CandidatoAudicaoController.deletarCandidato);
 
 export default router;

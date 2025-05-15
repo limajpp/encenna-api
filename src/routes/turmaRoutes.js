@@ -1,16 +1,11 @@
-import {
-  atualizarTurma,
-  criarTurma,
-  deletarTurma,
-  listarTurmas,
-} from "../controllers/turmaController.js";
 import express from "express";
+import TurmaController from "../controllers/turmaController.js";
 
 const router = express.Router();
 
-router.post("/criarTurma", criarTurma);
-router.get("/listarTurmas", listarTurmas);
-router.put("/atualizarTurma/:id", atualizarTurma);
-router.delete("/deletarTurma/:id", deletarTurma);
+router.post("/criarTurma", TurmaController.criarTurma);
+router.get("/listarTurmas", TurmaController.listarTurmas);
+router.put("/atualizarTurma/:id", TurmaController.atualizarTurma);
+router.delete("/deletarTurma/:id", TurmaController.deletarTurma);
 
 export default router;
