@@ -3,12 +3,11 @@ import Usuario from "../models/usuario.js";
 export default class UsuarioController {
   static criarUsuario = async (req, res) => {
     try {
-      const { nome, email, senhaHash, telefone, cpf, tipo, fotoPerfil } =
-        req.body;
+      const { nome, email, senha, telefone, cpf, tipo, fotoPerfil } = req.body;
       const novoUsuario = new Usuario({
         nome,
         email,
-        senhaHash,
+        senha,
         telefone,
         cpf,
         tipo,
@@ -20,7 +19,9 @@ export default class UsuarioController {
     } catch (error) {
       res
         .status(404)
-        .json({ erro: "Algo deu errado durante a criação do novo usuário!" });
+        .json({
+          erro: `Algo deu errado durante a criação do novo usuário, ${error}`,
+        });
       console.error(
         "Algo deu errado ao tentar criar um novo usuário...",
         error
@@ -42,12 +43,11 @@ export default class UsuarioController {
 
   static atualizarUsuario = async (req, res) => {
     try {
-      const { nome, email, senhaHash, telefone, cpf, tipo, fotoPerfil } =
-        req.body;
+      const { nome, email, senha, telefone, cpf, tipo, fotoPerfil } = req.body;
       const usuarioAntigo = await Usuario.findByIdAndUpdate(req.params.id, {
         nome,
         email,
-        senhaHash,
+        senha,
         telefone,
         cpf,
         tipo,
@@ -69,5 +69,15 @@ export default class UsuarioController {
     } catch (error) {
       console.error("Algo deu errado ao tentar excluir o usuário...", error);
     }
+  };
+
+  static loginUsuario = async (req, res) => {
+    const { email, senha } = req.body;
+    const user = await Usuario.findOne({ email });
+    if (!user) return res.status(400).json({ erro: "Usuário não encontrado" });
+
+    const senhaCorreta = await bcrypt.compare(senha, user.senha);
+    if (!senhaCorreta) return res.status(401).json({ erro: "Senha incorreta" });
+    res.json({ mensagem: "Login realizado com sucesso", user });
   };
 }
