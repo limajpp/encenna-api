@@ -1,4 +1,9 @@
 import Usuario from "../models/usuario.js";
+import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+dotenv.config();
 
 export default class UsuarioController {
   static criarUsuario = async (req, res) => {
@@ -17,11 +22,9 @@ export default class UsuarioController {
       res.status(201).json(novoUsuario);
       console.log("Usuário criado com sucesso!");
     } catch (error) {
-      res
-        .status(404)
-        .json({
-          erro: `Algo deu errado durante a criação do novo usuário, ${error}`,
-        });
+      res.status(404).json({
+        erro: `Algo deu errado durante a criação do novo usuário, ${error}`,
+      });
       console.error(
         "Algo deu errado ao tentar criar um novo usuário...",
         error
@@ -78,6 +81,13 @@ export default class UsuarioController {
 
     const senhaCorreta = await bcrypt.compare(senha, user.senha);
     if (!senhaCorreta) return res.status(401).json({ erro: "Senha incorreta" });
-    res.json({ mensagem: "Login realizado com sucesso", user });
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token });
   };
 }
