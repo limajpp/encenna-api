@@ -4,90 +4,214 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error(
+    "FATAL ERROR: JWT_SECRET não está definido nas variáveis de ambiente."
+  );
+  process.exit(1);
+}
 
 export default class UsuarioController {
   static criarUsuario = async (req, res) => {
     try {
       const { nome, email, senha, telefone, cpf, tipo, fotoPerfil } = req.body;
-      const novoUsuario = new Usuario({
+
+      if (!nome || !senha || !telefone || !cpf || !tipo) {
+        return res
+          .status(400)
+          .json({
+            erro: "Campos obrigatórios ausentes: nome, senha, telefone, cpf, tipo.",
+          });
+      }
+
+      const dadosNovoUsuario = {
         nome,
         email,
         senha,
         telefone,
         cpf,
         tipo,
-        fotoPerfil,
-      });
+        fotoPerfil: fotoPerfil || "",
+      };
+
+      if (tipo === "Usuário") {
+        dadosNovoUsuario.frequencia = 100;
+      }
+
+      const novoUsuario = new Usuario(dadosNovoUsuario);
       await novoUsuario.save();
-      res.status(201).json(novoUsuario);
+
+      const usuarioParaRetorno = novoUsuario.toObject();
+      delete usuarioParaRetorno.senha;
+
+      res.status(201).json(usuarioParaRetorno);
       console.log("Usuário criado com sucesso!");
     } catch (error) {
-      res.status(404).json({
-        erro: `Algo deu errado durante a criação do novo usuário, ${error}`,
+      console.error("Erro ao criar novo usuário:", error);
+      if (error.name === "ValidationError") {
+        const errosDeValidacao = Object.values(error.errors).map(
+          (err) => err.message
+        );
+        return res
+          .status(400)
+          .json({ erro: "Erro de validação.", detalhes: errosDeValidacao });
+      }
+      if (error.code === 11000) {
+        const campoDuplicado = Object.keys(error.keyValue)[0];
+        return res
+          .status(409)
+          .json({
+            erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já existe.`,
+          });
+      }
+      res.status(500).json({
+        erro: "Ocorreu um erro inesperado ao tentar criar o usuário.",
+        detalhes: error.message,
       });
-      console.error(
-        "Algo deu errado ao tentar criar um novo usuário...",
-        error
-      );
     }
   };
 
   static listarUsuarios = async (req, res) => {
     try {
-      const usuarios = await Usuario.find();
-      if (!usuarios)
-        return res.status(404).json({ erro: "A lista de usuário está vazia." });
+      const usuarios = await Usuario.find().select("-senha");
 
       res.status(200).json(usuarios);
     } catch (error) {
-      console.error("Algo deu errado ao tentar listar os usuários...", error);
+      console.error("Erro ao listar usuários:", error);
+      res
+        .status(500)
+        .json({ erro: "Erro interno ao tentar listar os usuários." });
     }
   };
 
   static atualizarUsuario = async (req, res) => {
     try {
-      const { nome, email, senha, telefone, cpf, tipo, fotoPerfil } = req.body;
-      const usuarioAntigo = await Usuario.findByIdAndUpdate(req.params.id, {
-        nome,
-        email,
-        senha,
-        telefone,
-        cpf,
-        tipo,
-        fotoPerfil,
-      });
-      res.json(usuarioAntigo);
+      const { id } = req.params;
+      const dadosAtualizacao = req.body;
+
+      delete dadosAtualizacao.cpf;
+      delete dadosAtualizacao.tipo;
+
+      if (Object.keys(dadosAtualizacao).length === 0) {
+        return res
+          .status(400)
+          .json({ erro: "Nenhum dado fornecido para atualização." });
+      }
+
+      if (dadosAtualizacao.senha) {
+        const salt = await bcrypt.genSalt(10);
+        dadosAtualizacao.senha = await bcrypt.hash(
+          dadosAtualizacao.senha,
+          salt
+        );
+      }
+
+      const usuarioAtualizado = await Usuario.findByIdAndUpdate(
+        id,
+        { $set: dadosAtualizacao },
+        { new: true, runValidators: true }
+      ).select("-senha");
+
+      if (!usuarioAtualizado) {
+        return res.status(404).json({ erro: "Usuário não encontrado." });
+      }
+
+      res.status(200).json(usuarioAtualizado);
       console.log("Usuário atualizado com sucesso!");
     } catch (error) {
-      console.error("Algo deu errado ao tentar atualizar o usuário", error);
+      console.error("Erro ao atualizar usuário:", error);
+      if (error.name === "ValidationError") {
+        const errosDeValidacao = Object.values(error.errors).map(
+          (err) => err.message
+        );
+        return res
+          .status(400)
+          .json({ erro: "Erro de validação.", detalhes: errosDeValidacao });
+      }
+      if (error.name === "CastError" && error.path === "_id") {
+        return res.status(400).json({ erro: "ID do usuário inválido." });
+      }
+      if (error.code === 11000) {
+        const campoDuplicado = Object.keys(error.keyValue)[0];
+        return res
+          .status(409)
+          .json({
+            erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já está em uso.`,
+          });
+      }
+      res
+        .status(500)
+        .json({ erro: "Erro interno ao tentar atualizar o usuário." });
     }
   };
 
   static deletarUsuario = async (req, res) => {
     try {
-      const oldUser = await Usuario.findByIdAndDelete(req.params.id);
-      if (!oldUser) res.status(404).json({ erro: "O usuário não existe..." });
+      const { id } = req.params;
+      const usuarioDeletado = await Usuario.findByIdAndDelete(id);
+
+      if (!usuarioDeletado) {
+        return res.status(404).json({ erro: "Usuário não encontrado." });
+      }
+
       console.log("Usuário excluído com sucesso!");
       res.status(204).end();
     } catch (error) {
-      console.error("Algo deu errado ao tentar excluir o usuário...", error);
+      console.error("Erro ao excluir usuário:", error);
+      if (error.name === "CastError" && error.path === "_id") {
+        return res.status(400).json({ erro: "ID do usuário inválido." });
+      }
+      res
+        .status(500)
+        .json({ erro: "Erro interno ao tentar excluir o usuário." });
     }
   };
 
   static loginUsuario = async (req, res) => {
-    const { email, senha } = req.body;
-    const user = await Usuario.findOne({ email });
-    if (!user) return res.status(400).json({ erro: "Usuário não encontrado" });
+    try {
+      const { email, senha } = req.body;
 
-    const senhaCorreta = await bcrypt.compare(senha, user.senha);
-    if (!senhaCorreta) return res.status(401).json({ erro: "Senha incorreta" });
+      if (!email || !senha) {
+        return res
+          .status(400)
+          .json({ erro: "Email e senha são obrigatórios." });
+      }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+      const usuario = await Usuario.findOne({ email });
+      if (!usuario) {
+        return res.status(401).json({ erro: "Credenciais inválidas." });
+      }
 
-    res.status(200).json({ token });
+      const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+      if (!senhaCorreta) {
+        return res.status(401).json({ erro: "Credenciais inválidas." });
+      }
+
+      const token = jwt.sign(
+        { id: usuario._id, tipo: usuario.tipo, email: usuario.email },
+        JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      res
+        .status(200)
+        .json({
+          token,
+          usuario: {
+            id: usuario._id,
+            nome: usuario.nome,
+            email: usuario.email,
+            tipo: usuario.tipo,
+            fotoPerfil: usuario.fotoPerfil,
+          },
+        });
+    } catch (error) {
+      console.error("Erro no login:", error);
+      res
+        .status(500)
+        .json({ erro: "Erro interno no servidor durante o login." });
+    }
   };
 }

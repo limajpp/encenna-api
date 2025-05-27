@@ -28,6 +28,12 @@ const usuarioSchema = mongoose.Schema({
     enum: ["Administrador", "Usuário", "Responsável"],
   },
   fotoPerfil: { type: String, required: false, default: "" },
+  frequencia: {
+    type: Number,
+    required: false, // Será obrigatório apenas se o tipo for "Usuário", definido no controller
+    min: [0, "Frequência não pode ser menor que 0."],
+    max: [100, "Frequência não pode ser maior que 100."],
+  },
 });
 
 usuarioSchema.pre("save", async function (next) {
