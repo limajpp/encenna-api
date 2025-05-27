@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const bibliotecaSchema = mongoose.Schema({
   titulo: { type: String, required: true },
-  autor: { type: String, required: true },
-  arquivo: { type: String, required: true }, // Path ou URL.
+  autor: { type: String, required: false },
+  arquivo: { type: String, required: false }, // Path ou URL.
   tipo: {
     type: String,
     required: true,
