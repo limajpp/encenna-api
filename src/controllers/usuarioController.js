@@ -19,11 +19,18 @@ export default class UsuarioController {
       const { nome, email, senha, telefone, cpf, tipo, fotoPerfil } = req.body;
 
       if (!nome || !senha || !telefone || !cpf || !tipo) {
-        return res
-          .status(400)
-          .json({
-            erro: "Campos obrigatórios ausentes: nome, senha, telefone, cpf, tipo.",
-          });
+        return res.status(400).json({
+          erro: "Campos obrigatórios ausentes: nome, senha, telefone, cpf, tipo.",
+        });
+      }
+
+      const tiposValidos = ["Administrador", "Professor", "Aluno"];
+      if (!tiposValidos.includes(tipo)) {
+        return res.status(400).json({
+          erro: `Tipo de usuário inválido. Tipos permitidos: ${tiposValidos.join(
+            ", "
+          )}.`,
+        });
       }
 
       const dadosNovoUsuario = {
@@ -36,8 +43,10 @@ export default class UsuarioController {
         fotoPerfil: fotoPerfil || "",
       };
 
-      if (tipo === "Usuário") {
+      if (tipo === "Aluno") {
         dadosNovoUsuario.frequencia = 100;
+      } else {
+        dadosNovoUsuario.frequencia = null;
       }
 
       const novoUsuario = new Usuario(dadosNovoUsuario);
@@ -60,11 +69,9 @@ export default class UsuarioController {
       }
       if (error.code === 11000) {
         const campoDuplicado = Object.keys(error.keyValue)[0];
-        return res
-          .status(409)
-          .json({
-            erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já existe.`,
-          });
+        return res.status(409).json({
+          erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já existe.`,
+        });
       }
       res.status(500).json({
         erro: "Ocorreu um erro inesperado ao tentar criar o usuário.",
@@ -135,11 +142,9 @@ export default class UsuarioController {
       }
       if (error.code === 11000) {
         const campoDuplicado = Object.keys(error.keyValue)[0];
-        return res
-          .status(409)
-          .json({
-            erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já está em uso.`,
-          });
+        return res.status(409).json({
+          erro: `O campo '${campoDuplicado}' com valor '${error.keyValue[campoDuplicado]}' já está em uso.`,
+        });
       }
       res
         .status(500)
@@ -185,6 +190,7 @@ export default class UsuarioController {
       }
 
       const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+
       if (!senhaCorreta) {
         return res.status(401).json({ erro: "Credenciais inválidas." });
       }
@@ -195,18 +201,17 @@ export default class UsuarioController {
         { expiresIn: "1h" }
       );
 
-      res
-        .status(200)
-        .json({
-          token,
-          usuario: {
-            id: usuario._id,
-            nome: usuario.nome,
-            email: usuario.email,
-            tipo: usuario.tipo,
-            fotoPerfil: usuario.fotoPerfil,
-          },
-        });
+      res.status(200).json({
+        token,
+        usuario: {
+          id: usuario._id,
+          nome: usuario.nome,
+          email: usuario.email,
+          tipo: usuario.tipo,
+          fotoPerfil: usuario.fotoPerfil,
+          frequencia: usuario.frequencia,
+        },
+      });
     } catch (error) {
       console.error("Erro no login:", error);
       res

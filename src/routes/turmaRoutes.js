@@ -1,11 +1,20 @@
 import express from "express";
 import TurmaController from "../controllers/turmaController.js";
+import verificarToken from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/criarTurma", TurmaController.criarTurma);
-router.get("/listarTurmas", TurmaController.listarTurmas);
-router.put("/atualizarTurma/:id", TurmaController.atualizarTurma);
-router.delete("/deletarTurma/:id", TurmaController.deletarTurma);
+router.post("/criarTurma", verificarToken, TurmaController.criarTurma);
+router.get("/listarTurmas", verificarToken, TurmaController.listarTurmas);
+router.put(
+  "/atualizarTurma/:id",
+  verificarToken,
+  TurmaController.atualizarTurma
+);
+router.delete(
+  "/deletarTurma/:id",
+  verificarToken,
+  TurmaController.deletarTurma
+);
 
 export default router;
